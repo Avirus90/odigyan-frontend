@@ -3,514 +3,652 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Odigyan - Competitive Exams Preparation</title>
-    
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-    
-    <!-- Google Sign-in -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    
-    <!-- Font Awesome -->
+    <title>Odigyan - Competitive Exam Preparation</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="style.css">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="https://img.icons8.com/color/48/000000/books.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --primary-dark: #0d47a1;
+            --secondary: #f8f9fa;
+            --text: #333;
+            --text-light: #666;
+            --white: #ffffff;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--white);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background: var(--white);
+            box-shadow: var(--shadow);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo img {
+            height: 40px;
+            width: auto;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .login-btn {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 10px 25px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .login-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-profile img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+        }
+
+        /* Banner Styles */
+        .banner {
+            margin-top: 80px;
+            height: 400px;
+            overflow: hidden;
+            border-radius: var(--radius);
+            position: relative;
+        }
+
+        .banner-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .banner-slide.active {
+            opacity: 1;
+        }
+
+        .banner-content {
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+            color: var(--white);
+            max-width: 600px;
+        }
+
+        .banner-content h2 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* Courses Section */
+        .courses-section {
+            padding: 60px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .section-title h2 {
+            font-size: 32px;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .course-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s;
+        }
+
+        .course-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .course-image {
+            height: 180px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 48px;
+        }
+
+        .course-content {
+            padding: 20px;
+        }
+
+        .course-content h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+
+        .course-content p {
+            color: var(--text-light);
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .course-features {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .course-features li {
+            margin-bottom: 8px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .course-features i {
+            color: var(--primary);
+            margin-right: 8px;
+        }
+
+        .enroll-btn {
+            width: 100%;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 12px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .enroll-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--white);
+            padding: 40px;
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--radius);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .submit-btn {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 12px 30px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Footer */
+        footer {
+            background: #f8f9fa;
+            padding: 40px 0;
+            margin-top: 60px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+
+        .footer-section h3 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .footer-section p,
+        .footer-section a {
+            color: var(--text-light);
+            margin-bottom: 10px;
+            display: block;
+            text-decoration: none;
+        }
+
+        .footer-section a:hover {
+            color: var(--primary);
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            color: var(--text-light);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .banner {
+                height: 300px;
+                margin-top: 120px;
+            }
+
+            .banner-content h2 {
+                font-size: 24px;
+            }
+
+            .courses-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Loading Spinner -->
-    <div id="loadingSpinner" class="spinner-overlay">
-        <div class="spinner"></div>
-        <div class="spinner-text">Loading Odigyan...</div>
-    </div>
-
     <!-- Header -->
-    <header class="header">
-        <div class="logo-container">
-            <img src="https://img.icons8.com/color/48/000000/books.png" alt="Odigyan Logo" class="logo" id="siteLogo">
-            <div class="site-title">
-                <span class="brand-name">Odigyan</span>
-                <span class="tagline">Competitive Exams Preparation</span>
-            </div>
-        </div>
-        
-        <div class="auth-section">
-            <div id="userInfo" class="user-info" style="display: none;">
-                <div class="user-avatar" id="userAvatar">
-                    <i class="fas fa-user"></i>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Odigyan Logo">
+                    <h1>Odigyan</h1>
                 </div>
-                <div class="user-details">
-                    <span id="userName" class="user-name">User</span>
-                    <span id="userEmail" class="user-email"></span>
+                <div class="nav-links">
+                    <a href="#home">Home</a>
+                    <a href="#courses">Courses</a>
+                    <a href="#about">About</a>
+                    <a href="#contact">Contact</a>
+                    <button class="login-btn" onclick="handleAuth()" id="authBtn">
+                        <i class="fas fa-sign-in-alt"></i> Login with Google
+                    </button>
+                    <div class="user-profile" id="userProfile" style="display: none;">
+                        <img id="userPhoto" src="" alt="">
+                        <span id="userName"></span>
+                        <button onclick="logout()" style="margin-left: 10px; padding: 5px 10px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            Logout
+                        </button>
+                    </div>
                 </div>
-            </div>
-            <button id="loginBtn" class="btn btn-primary">
-                <i class="fas fa-sign-in-alt"></i> Sign in with Google
-            </button>
-            <button id="logoutBtn" class="btn btn-secondary" style="display: none;">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
+            </nav>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main id="mainContent">
-        <!-- Banner Slider -->
-        <section class="banner-slider" id="bannerSlider">
-            <div class="banner-slide active">
-                <div class="banner-content">
-                    <h1>Welcome to Odigyan</h1>
-                    <p>Your ultimate destination for competitive exam preparation</p>
-                    <button class="btn btn-primary btn-lg" onclick="scrollToCourses()">
-                        <i class="fas fa-graduation-cap"></i> Explore Courses
-                    </button>
-                </div>
+    <!-- Banner -->
+    <section class="banner" id="home">
+        <div class="banner-slide active" style="background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');">
+            <div class="banner-content">
+                <h2>Prepare for Competitive Exams</h2>
+                <p>Comprehensive study material, video classes, mock tests, and current affairs</p>
             </div>
-            <div class="slide-dots">
-                <div class="dot active" onclick="changeSlide(0)"></div>
-                <div class="dot" onclick="changeSlide(1)"></div>
-                <div class="dot" onclick="changeSlide(2)"></div>
+        </div>
+        <div class="banner-slide" style="background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1501504905252-473c47e087f8?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');">
+            <div class="banner-content">
+                <h2>Expert Video Classes</h2>
+                <p>Learn from experienced educators with comprehensive video lectures</p>
             </div>
-        </section>
-
-        <!-- Admin Panel -->
-        <section class="admin-panel" id="adminPanel" style="display: none;">
-            <div class="container">
-                <h2 class="section-title">
-                    <i class="fas fa-tachometer-alt"></i> Admin Dashboard
-                </h2>
-                
-                <div class="admin-grid">
-                    <!-- Logo Management -->
-                    <div class="admin-card">
-                        <h3><i class="fas fa-image"></i> Logo Management</h3>
-                        <div class="form-group">
-                            <label for="logoUpload">Upload New Logo</label>
-                            <input type="file" id="logoUpload" class="form-control" accept="image/*">
-                            <button onclick="uploadLogo()" class="btn btn-primary">
-                                <i class="fas fa-upload"></i> Upload Logo
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Banner Management -->
-                    <div class="admin-card">
-                        <h3><i class="fas fa-images"></i> Banner Management</h3>
-                        <div class="form-group">
-                            <label for="bannerTitle">Banner Title</label>
-                            <input type="text" id="bannerTitle" class="form-control" placeholder="Enter banner title">
-                        </div>
-                        <div class="form-group">
-                            <label for="bannerDescription">Banner Description</label>
-                            <textarea id="bannerDescription" class="form-control" rows="3" placeholder="Enter banner description"></textarea>
-                        </div>
-                        <button onclick="addBanner()" class="btn btn-success">
-                            <i class="fas fa-plus"></i> Add Banner
-                        </button>
-                    </div>
-
-                    <!-- Course Management -->
-                    <div class="admin-card">
-                        <h3><i class="fas fa-book"></i> Course Management</h3>
-                        <div class="form-group">
-                            <label for="courseName">Course Name</label>
-                            <input type="text" id="courseName" class="form-control" placeholder="Enter course name">
-                        </div>
-                        <div class="form-group">
-                            <label for="courseDescription">Course Description</label>
-                            <textarea id="courseDescription" class="form-control" rows="3" placeholder="Enter course description"></textarea>
-                        </div>
-                        <button onclick="addCourse()" class="btn btn-success">
-                            <i class="fas fa-plus"></i> Add Course
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Student Database -->
-                <div class="admin-section">
-                    <h3><i class="fas fa-users"></i> Student Database</h3>
-                    <div id="studentsList" class="students-list">
-                        <div class="spinner"></div>
-                    </div>
-                </div>
+        </div>
+        <div class="banner-slide" style="background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1450101499163-c8848c66ca85?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');">
+            <div class="banner-content">
+                <h2>Practice Mock Tests</h2>
+                <p>Test your knowledge with customizable mock tests and detailed analytics</p>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Courses Section -->
-        <section class="courses-section" id="coursesSection">
-            <div class="container">
-                <h2 class="section-title">
-                    <i class="fas fa-book-open"></i> Our Courses
-                </h2>
-                <p class="section-subtitle">Choose from our comprehensive exam preparation courses</p>
-                
-                <div id="coursesContainer" class="courses-grid">
-                    <!-- Courses will be loaded here -->
-                    <div class="loading-courses">
-                        <div class="spinner"></div>
-                        <p>Loading courses...</p>
-                    </div>
-                </div>
+    <!-- Courses Section -->
+    <section class="courses-section" id="courses">
+        <div class="container">
+            <div class="section-title">
+                <h2>Our Courses</h2>
+                <p>Choose from a wide range of competitive exam preparation courses</p>
             </div>
-        </section>
-
-        <!-- Student Dashboard -->
-        <section class="dashboard" id="studentDashboard" style="display: none;">
-            <div class="container">
-                <h2 class="section-title">
-                    <i class="fas fa-user-graduate"></i> My Learning Dashboard
-                </h2>
-                
-                <div class="dashboard-stats">
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-book"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3 id="enrolledCount">0</h3>
-                            <p>Courses Enrolled</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3 id="progressPercent">0%</h3>
-                            <p>Overall Progress</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-medal"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3 id="testsTaken">0</h3>
-                            <p>Tests Taken</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="enrolledCourses" class="enrolled-courses">
-                    <!-- Enrolled courses will appear here -->
-                    <div class="empty-state">
-                        <i class="fas fa-graduation-cap"></i>
-                        <h3>No Courses Enrolled Yet</h3>
-                        <p>Explore our courses and start your learning journey!</p>
-                        <button class="btn btn-primary" onclick="scrollToCourses()">
-                            <i class="fas fa-search"></i> Browse Courses
-                        </button>
-                    </div>
-                </div>
+            <div class="courses-grid" id="coursesContainer">
+                <!-- Courses will be loaded dynamically -->
             </div>
-        </section>
-    </main>
+        </div>
+    </section>
 
-    <!-- Modals -->
-    
     <!-- Student Registration Modal -->
     <div class="modal" id="registrationModal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-user-plus"></i> Complete Your Registration</h3>
-                <button class="close-modal" onclick="closeModal('registrationModal')">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2 style="margin-bottom: 20px; color: var(--primary);">Complete Your Profile</h2>
             <form id="registrationForm">
                 <div class="form-group">
-                    <label for="fullName">
-                        <i class="fas fa-user"></i> Full Name
-                    </label>
-                    <input type="text" id="fullName" class="form-control" required 
-                           placeholder="Enter your full name">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" required>
                 </div>
                 <div class="form-group">
-                    <label for="dob">
-                        <i class="fas fa-calendar"></i> Date of Birth
-                    </label>
-                    <input type="date" id="dob" class="form-control" required>
+                    <label for="dob">Date of Birth</label>
+                    <input type="date" id="dob" required>
                 </div>
                 <div class="form-group">
-                    <label for="phone">
-                        <i class="fas fa-phone"></i> Phone Number
-                    </label>
-                    <input type="tel" id="phone" class="form-control" required 
-                           placeholder="Enter your phone number">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" required>
                 </div>
                 <div class="form-group">
-                    <label for="education">
-                        <i class="fas fa-graduation-cap"></i> Education Level
-                    </label>
-                    <select id="education" class="form-control" required>
-                        <option value="">Select Education Level</option>
-                        <option value="highschool">High School</option>
-                        <option value="undergraduate">Undergraduate</option>
+                    <label for="education">Education Level</label>
+                    <select id="education" required>
+                        <option value="">Select Education</option>
+                        <option value="10th">10th Pass</option>
+                        <option value="12th">12th Pass</option>
                         <option value="graduate">Graduate</option>
-                        <option value="postgraduate">Post Graduate</option>
-                        <option value="phd">PhD</option>
+                        <option value="post-graduate">Post Graduate</option>
+                        <option value="other">Other</option>
                     </select>
                 </div>
-                <button type="submit" class="btn btn-primary btn-block">
-                    <i class="fas fa-check-circle"></i> Complete Registration
-                </button>
+                <button type="submit" class="submit-btn">Complete Registration</button>
             </form>
         </div>
     </div>
 
-    <!-- Course Content Modal -->
-    <div class="modal" id="courseContentModal">
-        <div class="modal-content large-modal">
-            <div class="modal-header">
-                <h3 id="modalCourseTitle"></h3>
-                <button class="close-modal" onclick="closeModal('courseContentModal')">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('videos')">
-                    <i class="fas fa-video"></i> Video Classes
-                </button>
-                <button class="tab-btn" onclick="switchTab('notes')">
-                    <i class="fas fa-file-pdf"></i> Study Notes
-                </button>
-                <button class="tab-btn" onclick="switchTab('tests')">
-                    <i class="fas fa-question-circle"></i> Mock Tests
-                </button>
-                <button class="tab-btn" onclick="switchTab('currentAffairs')">
-                    <i class="fas fa-newspaper"></i> Current Affairs
-                </button>
-            </div>
-            
-            <div id="contentContainer" class="content-container">
-                <!-- Content will be loaded here -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Mock Test Modal -->
-    <div class="modal" id="mockTestModal">
-        <div class="modal-content test-modal">
-            <div class="modal-header">
-                <div class="test-header">
-                    <h3><i class="fas fa-clock"></i> Mock Test</h3>
-                    <div class="timer" id="testTimer">30:00</div>
-                </div>
-                <button class="close-modal" onclick="closeTest()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="test-container">
-                <div class="question-navigation" id="questionNav">
-                    <!-- Navigation buttons will be generated here -->
-                </div>
-                
-                <div class="question-container">
-                    <div class="question-header">
-                        <span class="question-number" id="questionNumber">Q1</span>
-                        <span class="question-section" id="questionSection"></span>
-                    </div>
-                    <div class="question-text" id="questionText"></div>
-                    
-                    <div class="options-container" id="optionsContainer"></div>
-                    
-                    <div class="test-actions">
-                        <button class="btn btn-secondary" onclick="previousQuestion()">
-                            <i class="fas fa-arrow-left"></i> Previous
-                        </button>
-                        <button class="btn btn-secondary" onclick="nextQuestion()">
-                            Next <i class="fas fa-arrow-right"></i>
-                        </button>
-                        <button class="btn btn-primary" onclick="submitTest()" id="submitTestBtn">
-                            <i class="fas fa-paper-plane"></i> Submit Test
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Test Results Modal -->
-    <div class="modal" id="resultsModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-medal"></i> Test Results</h3>
-                <button class="close-modal" onclick="closeModal('resultsModal')">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div id="testResults" class="test-results">
-                <!-- Results will be displayed here -->
-            </div>
-        </div>
-    </div>
-
     <!-- Footer -->
-    <footer class="footer">
+    <footer id="contact">
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <div class="footer-logo">
-                        <img src="https://img.icons8.com/color/48/000000/books.png" alt="Odigyan Logo">
-                        <div class="footer-brand">
-                            <h3>Odigyan</h3>
-                            <p>Empowering Competitive Minds</p>
-                        </div>
-                    </div>
-                    <p class="footer-description">
-                        Your trusted partner for competitive exam preparation with comprehensive study materials, video classes, and mock tests.
-                    </p>
+                    <h3>Odigyan</h3>
+                    <p>Your trusted partner for competitive exam preparation.</p>
                 </div>
-                
                 <div class="footer-section">
-                    <h4>Quick Links</h4>
-                    <ul class="footer-links">
-                        <li><a href="#" onclick="scrollToCourses()"><i class="fas fa-chevron-right"></i> Courses</a></li>
-                        <li><a href="#" onclick="showAbout()"><i class="fas fa-chevron-right"></i> About Us</a></li>
-                        <li><a href="https://t.me/Odigyan" target="_blank"><i class="fas fa-chevron-right"></i> Telegram Channel</a></li>
-                        <li><a href="#" onclick="showContact()"><i class="fas fa-chevron-right"></i> Contact</a></li>
-                    </ul>
+                    <h3>Quick Links</h3>
+                    <a href="#home">Home</a>
+                    <a href="#courses">Courses</a>
+                    <a href="#about">About Us</a>
+                    <a href="#contact">Contact</a>
                 </div>
-                
                 <div class="footer-section">
-                    <h4>Contact Info</h4>
-                    <ul class="contact-info">
-                        <li><i class="fas fa-envelope"></i> support@odigyan.in</li>
-                        <li><i class="fas fa-phone"></i> +91 1234567890</li>
-                        <li><i class="fas fa-map-marker-alt"></i> Hosted on GitHub Pages</li>
-                    </ul>
-                    <div class="social-links">
-                        <a href="https://t.me/Odigyan" target="_blank" class="social-link">
-                            <i class="fab fa-telegram"></i>
-                        </a>
-                        <a href="#" class="social-link">
-                            <i class="fab fa-youtube"></i>
-                        </a>
-                        <a href="#" class="social-link">
-                            <i class="fab fa-twitter"></i>
-                        </a>
-                        <a href="#" class="social-link">
-                            <i class="fab fa-facebook"></i>
-                        </a>
-                    </div>
+                    <h3>Contact Us</h3>
+                    <p><i class="fas fa-envelope"></i> bimbadharbaghel0@gmail.com</p>
+                    <p><i class="fas fa-phone"></i> +91 9876543210</p>
                 </div>
             </div>
-            
-            <div class="footer-bottom">
-                <p class="copyright">
-                    © 2024 Odigyan. All rights reserved. | 
-                    <a href="#" onclick="showPrivacy()">Privacy Policy</a> | 
-                    <a href="#" onclick="showTerms()">Terms of Service</a>
-                </p>
+            <div class="copyright">
+                <p>&copy; 2024 Odigyan. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
-    <!-- JavaScript Files -->
-    <script src="config.js"></script>
-    <script src="app.js"></script>
+    <!-- Firebase Config -->
+    <script src="firebase-config.js"></script>
     
+    <!-- Main Script -->
     <script>
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
-            // Hide loading spinner after 1 second
-            setTimeout(() => {
-                document.getElementById('loadingSpinner').style.display = 'none';
-            }, 1000);
-            
-            // Start banner slider
+        // Firebase configuration will be in firebase-config.js
+        let currentUser = null;
+        let coursesData = [];
+
+        // Initialize when page loads
+        document.addEventListener('DOMINIZEDContentLoaded', function() {
+            initializeFirebase();
+            loadCourses();
             startBannerSlider();
         });
 
+        // Banner Slider
         function startBannerSlider() {
+            let slides = document.querySelectorAll('.banner-slide');
             let currentSlide = 0;
-            const slides = document.querySelectorAll('.banner-slide');
-            const dots = document.querySelectorAll('.dot');
-            
-            if (slides.length <= 1) return;
             
             setInterval(() => {
                 slides[currentSlide].classList.remove('active');
-                dots[currentSlide].classList.remove('active');
-                
                 currentSlide = (currentSlide + 1) % slides.length;
-                
                 slides[currentSlide].classList.add('active');
-                dots[currentSlide].classList.add('active');
             }, 5000);
         }
 
-        function changeSlide(index) {
-            const slides = document.querySelectorAll('.banner-slide');
-            const dots = document.querySelectorAll('.dot');
-            
-            slides.forEach(slide => slide.classList.remove('active'));
-            dots.forEach(dot => dot.classList.remove('active'));
-            
-            slides[index].classList.add('active');
-            dots[index].classList.add('active');
-        }
-
-        function scrollToCourses() {
-            document.getElementById('coursesSection').scrollIntoView({ 
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'flex';
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        function closeTest() {
-            if (confirm('Are you sure you want to leave the test? Your progress will be lost.')) {
-                closeModal('mockTestModal');
-                if (window.testTimer) {
-                    clearInterval(window.testTimer);
-                }
+        // Load Courses
+        async function loadCourses() {
+            try {
+                const response = await fetch('https://odigyan-backend.vercel.app/api/courses');
+                const data = await response.json();
+                coursesData = data;
+                displayCourses(data);
+            } catch (error) {
+                console.error('Error loading courses:', error);
+                // Fallback sample data
+                coursesData = [
+                    {
+                        id: '1',
+                        name: 'UPSC Civil Services',
+                        description: 'Complete preparation for UPSC Civil Services Examination',
+                        image: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
+                        features: ['Video Classes', 'Study Notes', 'Mock Tests', 'Current Affairs']
+                    },
+                    {
+                        id: '2',
+                        name: 'SSC CGL',
+                        description: 'Comprehensive course for SSC Combined Graduate Level',
+                        image: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
+                        features: ['Video Lectures', 'PDF Notes', 'Practice Tests', 'Weekly Updates']
+                    },
+                    {
+                        id: '3',
+                        name: 'Banking PO',
+                        description: 'Preparation for Banking Probationary Officer exams',
+                        image: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
+                        features: ['Expert Videos', 'Study Material', 'Mock Exams', 'Daily Current Affairs']
+                    }
+                ];
+                displayCourses(coursesData);
             }
         }
 
-        function switchTab(tabName) {
-            // Remove active class from all tabs
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
+        function displayCourses(courses) {
+            const container = document.getElementById('coursesContainer');
+            container.innerHTML = '';
+            
+            courses.forEach(course => {
+                const courseCard = document.createElement('div');
+                courseCard.className = 'course-card';
+                courseCard.innerHTML = `
+                    <div class="course-image">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="course-content">
+                        <h3>${course.name}</h3>
+                        <p>${course.description}</p>
+                        <ul class="course-features">
+                            ${course.features.map(feature => `<li><i class="fas fa-check"></i> ${feature}</li>`).join('')}
+                        </ul>
+                        <button class="enroll-btn" onclick="enrollCourse('${course.id}')">Enroll Now</button>
+                    </div>
+                `;
+                container.appendChild(courseCard);
             });
+        }
+
+        // Enrollment function
+        function enrollCourse(courseId) {
+            if (!currentUser) {
+                alert('Please login first');
+                handleAuth();
+                return;
+            }
             
-            // Add active class to clicked tab
-            event.target.classList.add('active');
-            
-            // Load content for the selected tab
-            if (typeof window.loadTabContent === 'function') {
-                window.loadTabContent(tabName);
+            const course = coursesData.find(c => c.id === courseId);
+            if (course) {
+                window.location.href = `course.html?id=${courseId}&name=${encodeURIComponent(course.name)}`;
             }
         }
 
-        function showAbout() {
-            alert('Odigyan is a comprehensive platform for competitive exam preparation. We provide quality study materials, video classes, and mock tests to help students achieve their goals.');
+        // Modal functions
+        function showRegistrationModal() {
+            document.getElementById('registrationModal').style.display = 'flex';
         }
 
-        function showContact() {
-            alert('Contact us at: support@odigyan.in\nPhone: +91 1234567890\nTelegram: t.me/Odigyan');
+        function closeModal() {
+            document.getElementById('registrationModal').style.display = 'none';
         }
 
-        function showPrivacy() {
-            alert('Privacy Policy: Your data is secure with us. We only collect necessary information for course enrollment and progress tracking.');
-        }
+        // Handle form submission
+        document.getElementById('registrationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const userData = {
+                uid: currentUser.uid,
+                email: currentUser.email,
+                name: document.getElementById('fullName').value,
+                dob: document.getElementById('dob').value,
+                phone: document.getElementById('phone').value,
+                education: document.getElementById('education').value,
+                createdAt: new Date().toISOString()
+            };
 
-        function showTerms() {
-            alert('Terms of Service: By using Odigyan, you agree to our terms. All study materials are for personal use only.');
+            try {
+                // Save user data to Firestore
+                await firebase.firestore().collection('students').doc(currentUser.uid).set(userData);
+                closeModal();
+                alert('Registration completed successfully!');
+                updateUIAfterLogin(currentUser);
+            } catch (error) {
+                console.error('Error saving user data:', error);
+                alert('Error saving data. Please try again.');
+            }
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('registrationModal');
+            if (event.target === modal) {
+                closeModal();
+            }
         }
     </script>
 </body>
