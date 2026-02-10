@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course - Odigyan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --primary-dark: #0d47a1;
+            --secondary: #f8f9fa;
+            --text: #333;
+            --text-light: #666;
+            --white: #ffffff;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f7fa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: var(--white);
+            box-shadow: var(--shadow);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo img {
+            height: 40px;
+            width: auto;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .back-btn {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Course Header */
+        .course-header {
+            margin-top: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--white);
+            padding: 60px 0;
+            text-align: center;
+            border-radius: var(--radius);
+        }
+
+        .course-header h1 {
+            font-size: 36px;
+            margin-bottom: 15px;
+        }
+
+        .course-header p {
+            font-size: 18px;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Course Content */
+        .course-content {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            height: fit-content;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .menu-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .menu-item i {
+            margin-right: 10px;
+            width: 20px;
+        }
+
+        /* Content Area */
+        .content-area {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 30px;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .section-title {
+            color: var(--primary);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        /* Materials Grid */
+        .materials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .material-card {
+            background: var(--secondary);
+            padding: 20px;
+            border-radius: var(--radius);
+            transition: transform 0.3s;
+        }
+
+        .material-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .material-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .material-content h3 {
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+
+        .material-content p {
+            color: var(--text-light);
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .view-btn {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 8px 20px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .view-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Chapters List */
+        .chapters-list {
+            list-style: none;
+        }
+
+        .chapter-item {
+            background: var(--secondary);
+            margin-bottom: 10px;
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .chapter-header {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            background: var(--white);
+            border-left: 4px solid var(--primary);
+        }
+
+        .chapter-content {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .chapter-content.active {
+            padding: 20px;
+            max-height: 500px;
+        }
+
+        .chapter-files {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .file-item {
+            background: var(--white);
+            padding: 15px;
+            border-radius: var(--radius);
+            text-align: center;
+        }
+
+        .file-item i {
+            font-size: 24px;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        /* Mock Test Section */
+        .mock-test-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--white);
+            padding: 30px;
+            border-radius: var(--radius);
+            margin-bottom: 30px;
+        }
+
+        .test-info {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-item h3 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .info-item p {
+            opacity: 0.8;
+            font-size: 14px;
+        }
+
+        .start-test-btn {
+            background: var(--white);
+            color: var(--primary);
+            border: none;
+            padding: 12px 30px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: transform 0.3s;
+        }
+
+        .start-test-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Current Affairs */
+        .current-affairs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .affairs-card {
+            background: var(--secondary);
+            padding: 20px;
+            border-radius: var(--radius);
+        }
+
+        .affairs-date {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .course-content {
+                grid-template-columns: 1fr;
+            }
+
+            .course-header h1 {
+                font-size: 28px;
+            }
+
+            .materials-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .test-info {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Logo">
+                    <h1>Odigyan</h1>
+                </div>
+                <button class="back-btn" onclick="window.location.href='index.html'">
+                    <i class="fas fa-arrow-left"></i> Back to Courses
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Course Header -->
+    <div class="course-header">
+        <div class="container">
+            <h1 id="courseTitle">Course Name</h1>
+            <p id="courseDescription">Course description will appear here</p>
+        </div>
+    </div>
+
+    <!-- Course Content -->
+    <div class="container">
+        <div class="course-content">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <ul class="sidebar-menu">
+                    <li class="menu-item active" onclick="showSection('overview')">
+                        <i class="fas fa-home"></i> Course Overview
+                    </li>
+                    <li class="menu-item" onclick="showSection('videos')">
+                        <i class="fas fa-video"></i> Video Classes
+                    </li>
+                    <li class="menu-item" onclick="showSection('notes')">
+                        <i class="fas fa-file-pdf"></i> Study Notes
+                    </li>
+                    <li class="menu-item" onclick="showSection('mocktest')">
+                        <i class="fas fa-file-alt"></i> Mock Tests
+                    </li>
+                    <li class="menu-item" onclick="showSection('current')">
+                        <i class="fas fa-newspaper"></i> Current Affairs
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Course Overview -->
+                <div class="content-section active" id="overview">
+                    <h2 class="section-title">Course Overview</h2>
+                    <div id="overviewContent">
+                        <!-- Will be loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- Video Classes -->
+                <div class="content-section" id="videos">
+                    <h2 class="section-title">Video Classes</h2>
+                    <div class="chapters-list" id="videosList">
+                        <!-- Will be loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- Study Notes -->
+                <div class="content-section" id="notes">
+                    <h2 class="section-title">Study Notes</h2>
+                    <div class="chapters-list" id="notesList">
+                        <!-- Will be loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- Mock Tests -->
+                <div class="content-section" id="mocktest">
+                    <h2 class="section-title">Mock Tests</h2>
+                    <div class="mock-test-card">
+                        <div class="test-info">
+                            <div class="info-item">
+                                <h3 id="testCount">0</h3>
+                                <p>Total Tests</p>
+                            </div>
+                            <div class="info-item">
+                                <h3 id="avgScore">-</h3>
+                                <p>Average Score</p>
+                            </div>
+                            <div class="info-item">
+                                <h3 id="lastScore">-</h3>
+                                <p>Last Attempt</p>
+                            </div>
+                        </div>
+                        <button class="start-test-btn" onclick="startMockTest()">
+                            <i class="fas fa-play"></i> Start New Test
+                        </button>
+                    </div>
+                    <div id="mockTestsList">
+                        <!-- Will be loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- Current Affairs -->
+                <div class="content-section" id="current">
+                    <h2 class="section-title">Current Affairs</h2>
+                    <div class="current-affairs-filters">
+                        <select id="affairsFilter" onchange="filterCurrentAffairs()">
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="yearly">Yearly</option>
+                        </select>
+                    </div>
+                    <div class="current-affairs-grid" id="currentAffairsList">
+                        <!-- Will be loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Config -->
+    <script src="firebase-config.js"></script>
+    
+    <!-- Course Script -->
+    <script>
+        // Get course ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const courseId = urlParams.get('id');
+        const courseName = urlParams.get('name');
+        
+        let currentUser = null;
+        let courseData = null;
+        let currentMaterials = [];
+
+        // Check authentication
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                if (courseId) {
+                    loadCourseData();
+                } else {
+                    window.location.href = 'index.html';
+                }
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Load course data
+        async function loadCourseData() {
+            try {
+                // Set course title
+                if (courseName) {
+                    document.getElementById('courseTitle').textContent = decodeURIComponent(courseName);
+                }
+                
+                // Load course details
+                const courseDoc = await db.collection('courses').doc(courseId).get();
+                if (courseDoc.exists) {
+                    courseData = courseDoc.data();
+                    document.getElementById('courseDescription').textContent = courseData.description;
+                    
+                    // Load overview
+                    document.getElementById('overviewContent').innerHTML = `
+                        <div style="margin-bottom: 30px;">
+                            <h3 style="color: var(--primary); margin-bottom: 15px;">Course Features</h3>
+                            <ul style="list-style: none; padding-left: 20px;">
+                                ${courseData.features.split(',').map(feature => `<li style="margin-bottom: 10px;"><i class="fas fa-check" style="color: #28a745; margin-right: 10px;"></i>${feature.trim()}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 style="color: var(--primary); margin-bottom: 15px;">Course Description</h3>
+                            <p>${courseData.description}</p>
+                        </div>
+                    `;
+                }
+                
+                // Load materials
+                await loadMaterials();
+                
+                // Load mock tests
+                await loadMockTests();
+                
+                // Load current affairs
+                await loadCurrentAffairs();
+                
+            } catch (error) {
+                console.error('Error loading course data:', error);
+            }
+        }
+
+        // Load materials
+        async function loadMaterials() {
+            try {
+                // Load videos
+                const videosSnapshot = await db.collection('media')
+                    .where('courseId', '==', courseId)
+                    .where('type', '==', 'video')
+                    .get();
+                
+                const videosList = document.getElementById('videosList');
+                videosList.innerHTML = '';
+                
+                // Group videos by chapter
+                const chapters = {};
+                videosSnapshot.forEach(doc => {
+                    const video = doc.data();
+                    const chapterId = video.chapterId || 'general';
+                    
+                    if (!chapters[chapterId]) {
+                        chapters[chapterId] = {
+                            name: video.chapterName || 'General Videos',
+                            videos: []
+                        };
+                    }
+                    chapters[chapterId].videos.push(video);
+                });
+                
+                // Display chapters
+                Object.keys(chapters).forEach(chapterId => {
+                    const chapter = chapters[chapterId];
+                    const chapterHTML = `
+                        <div class="chapter-item">
+                            <div class="chapter-header" onclick="toggleChapter(this)">
+                                <span>${chapter.name}</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="chapter-content">
+                                <div class="chapter-files">
+                                    ${chapter.videos.map(video => `
+                                        <div class="file-item">
+                                            <i class="fas fa-video"></i>
+                                            <h4>${video.name}</h4>
+                                            <p>${video.duration || 'N/A'}</p>
+                                            <button class="view-btn" onclick="viewVideo('${video.fileId}')">
+                                                <i class="fas fa-play"></i> Watch
+                                            </button>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    videosList.innerHTML += chapterHTML;
+                });
+                
+                // Load notes
+                const notesSnapshot = await db.collection('media')
+                    .where('courseId', '==', courseId)
+                    .where('type', '==', 'notes')
+                    .get();
+                
+                const notesList = document.getElementById('notesList');
+                notesList.innerHTML = '';
+                
+                notesSnapshot.forEach(doc => {
+                    const note = doc.data();
+                    const noteHTML = `
+                        <div class="material-card">
+                            <div class="material-icon">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div class="material-content">
+                                <h3>${note.name}</h3>
+                                <p>${note.description || 'Study notes for this course'}</p>
+                                <button class="view-btn" onclick="viewPDF('${note.fileId}')">
+                                    <i class="fas fa-eye"></i> View Notes
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    notesList.innerHTML += noteHTML;
+                });
+                
+            } catch (error) {
+                console.error('Error loading materials:', error);
+            }
+        }
+
+        // Load mock tests
+        async function loadMockTests() {
+            try {
+                const snapshot = await db.collection('mockTests')
+                    .where('courseId', '==', courseId)
+                    .get();
+                
+                document.getElementById('testCount').textContent = snapshot.size;
+                
+                const testsList = document.getElementById('mockTestsList');
+                testsList.innerHTML = '';
+                
+                snapshot.forEach(doc => {
+                    const test = doc.data();
+                    const testHTML = `
+                        <div class="material-card">
+                            <div class="material-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="material-content">
+                                <h3>${test.name}</h3>
+                                <p>Duration: ${test.duration} minutes | Questions: ${test.questionsCount || 0}</p>
+                                <button class="view-btn" onclick="startSpecificTest('${doc.id}')">
+                                    <i class="fas fa-play"></i> Start Test
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    testsList.innerHTML += testHTML;
+                });
+                
+            } catch (error) {
+                console.error('Error loading mock tests:', error);
+            }
+        }
+
+        // Load current affairs
+        async function loadCurrentAffairs() {
+            try {
+                const snapshot = await db.collection('currentAffairs')
+                    .where('courseId', '==', courseId)
+                    .orderBy('date', 'desc')
+                    .limit(20)
+                    .get();
+                
+                const affairsList = document.getElementById('currentAffairsList');
+                affairsList.innerHTML = '';
+                
+                snapshot.forEach(doc => {
+                    const affair = doc.data();
+                    const affairHTML = `
+                        <div class="affairs-card">
+                            <div class="affairs-date">
+                                ${new Date(affair.date).toLocaleDateString()} - ${affair.type}
+                            </div>
+                            <h4>${affair.title}</h4>
+                            <p>${affair.description.substring(0, 100)}...</p>
+                            <button class="view-btn" onclick="viewCurrentAffair('${doc.id}')" style="margin-top: 10px;">
+                                <i class="fas fa-eye"></i> Read More
+                            </button>
+                        </div>
+                    `;
+                    affairsList.innerHTML += affairHTML;
+                });
+                
+            } catch (error) {
+                console.error('Error loading current affairs:', error);
+            }
+        }
+
+        // Section navigation
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all menu items
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Add active class to clicked menu item
+            event.target.classList.add('active');
+        }
+
+        // Toggle chapter
+        function toggleChapter(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('i');
+            
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            } else {
+                content.classList.add('active');
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+            }
+        }
+
+        // View video
+        function viewVideo(fileId) {
+            // In a real implementation, this would open the video player
+            // using Telegram file ID to stream the video
+            alert(`Would open video player for file ID: ${fileId}`);
+            // window.open(`https://api.telegram.org/file/bot<BOT_TOKEN>/<FILE_PATH>`, '_blank');
+        }
+
+        // View PDF
+        function viewPDF(fileId) {
+            // This would open the PDF viewer
+            alert(`Would open PDF viewer for file ID: ${fileId}`);
+            // Use PDF.js or similar to display the PDF
+        }
+
+        // Start mock test
+        function startMockTest() {
+            window.location.href = `mocktest.html?courseId=${courseId}`;
+        }
+
+        function startSpecificTest(testId) {
+            window.location.href = `mocktest.html?testId=${testId}&courseId=${courseId}`;
+        }
+
+        // View current affair
+        function viewCurrentAffair(affairId) {
+            // This would open the full current affair content
+            alert(`Would display full current affair content for ID: ${affairId}`);
+        }
+
+        // Filter current affairs
+        function filterCurrentAffairs() {
+            const filter = document.getElementById('affairsFilter').value;
+            // In full implementation, this would reload current affairs with the selected filter
+            alert(`Would filter current affairs by: ${filter}`);
+        }
+    </script>
+</body>
+</html>
