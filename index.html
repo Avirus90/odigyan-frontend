@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odigyan - Competitive Exams Preparation</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    
+    <!-- Google Sign-in -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="https://img.icons8.com/color/48/000000/books.png">
+</head>
+<body>
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="spinner-overlay">
+        <div class="spinner"></div>
+        <div class="spinner-text">Loading Odigyan...</div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo-container">
+            <img src="https://img.icons8.com/color/48/000000/books.png" alt="Odigyan Logo" class="logo" id="siteLogo">
+            <div class="site-title">
+                <span class="brand-name">Odigyan</span>
+                <span class="tagline">Competitive Exams Preparation</span>
+            </div>
+        </div>
+        
+        <div class="auth-section">
+            <div id="userInfo" class="user-info" style="display: none;">
+                <div class="user-avatar" id="userAvatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-details">
+                    <span id="userName" class="user-name">User</span>
+                    <span id="userEmail" class="user-email"></span>
+                </div>
+            </div>
+            <button id="loginBtn" class="btn btn-primary">
+                <i class="fas fa-sign-in-alt"></i> Sign in with Google
+            </button>
+            <button id="logoutBtn" class="btn btn-secondary" style="display: none;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="mainContent">
+        <!-- Banner Slider -->
+        <section class="banner-slider" id="bannerSlider">
+            <div class="banner-slide active">
+                <div class="banner-content">
+                    <h1>Welcome to Odigyan</h1>
+                    <p>Your ultimate destination for competitive exam preparation</p>
+                    <button class="btn btn-primary btn-lg" onclick="scrollToCourses()">
+                        <i class="fas fa-graduation-cap"></i> Explore Courses
+                    </button>
+                </div>
+            </div>
+            <div class="slide-dots">
+                <div class="dot active" onclick="changeSlide(0)"></div>
+                <div class="dot" onclick="changeSlide(1)"></div>
+                <div class="dot" onclick="changeSlide(2)"></div>
+            </div>
+        </section>
+
+        <!-- Admin Panel -->
+        <section class="admin-panel" id="adminPanel" style="display: none;">
+            <div class="container">
+                <h2 class="section-title">
+                    <i class="fas fa-tachometer-alt"></i> Admin Dashboard
+                </h2>
+                
+                <div class="admin-grid">
+                    <!-- Logo Management -->
+                    <div class="admin-card">
+                        <h3><i class="fas fa-image"></i> Logo Management</h3>
+                        <div class="form-group">
+                            <label for="logoUpload">Upload New Logo</label>
+                            <input type="file" id="logoUpload" class="form-control" accept="image/*">
+                            <button onclick="uploadLogo()" class="btn btn-primary">
+                                <i class="fas fa-upload"></i> Upload Logo
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Banner Management -->
+                    <div class="admin-card">
+                        <h3><i class="fas fa-images"></i> Banner Management</h3>
+                        <div class="form-group">
+                            <label for="bannerTitle">Banner Title</label>
+                            <input type="text" id="bannerTitle" class="form-control" placeholder="Enter banner title">
+                        </div>
+                        <div class="form-group">
+                            <label for="bannerDescription">Banner Description</label>
+                            <textarea id="bannerDescription" class="form-control" rows="3" placeholder="Enter banner description"></textarea>
+                        </div>
+                        <button onclick="addBanner()" class="btn btn-success">
+                            <i class="fas fa-plus"></i> Add Banner
+                        </button>
+                    </div>
+
+                    <!-- Course Management -->
+                    <div class="admin-card">
+                        <h3><i class="fas fa-book"></i> Course Management</h3>
+                        <div class="form-group">
+                            <label for="courseName">Course Name</label>
+                            <input type="text" id="courseName" class="form-control" placeholder="Enter course name">
+                        </div>
+                        <div class="form-group">
+                            <label for="courseDescription">Course Description</label>
+                            <textarea id="courseDescription" class="form-control" rows="3" placeholder="Enter course description"></textarea>
+                        </div>
+                        <button onclick="addCourse()" class="btn btn-success">
+                            <i class="fas fa-plus"></i> Add Course
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Student Database -->
+                <div class="admin-section">
+                    <h3><i class="fas fa-users"></i> Student Database</h3>
+                    <div id="studentsList" class="students-list">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Courses Section -->
+        <section class="courses-section" id="coursesSection">
+            <div class="container">
+                <h2 class="section-title">
+                    <i class="fas fa-book-open"></i> Our Courses
+                </h2>
+                <p class="section-subtitle">Choose from our comprehensive exam preparation courses</p>
+                
+                <div id="coursesContainer" class="courses-grid">
+                    <!-- Courses will be loaded here -->
+                    <div class="loading-courses">
+                        <div class="spinner"></div>
+                        <p>Loading courses...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Student Dashboard -->
+        <section class="dashboard" id="studentDashboard" style="display: none;">
+            <div class="container">
+                <h2 class="section-title">
+                    <i class="fas fa-user-graduate"></i> My Learning Dashboard
+                </h2>
+                
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="enrolledCount">0</h3>
+                            <p>Courses Enrolled</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="progressPercent">0%</h3>
+                            <p>Overall Progress</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-medal"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="testsTaken">0</h3>
+                            <p>Tests Taken</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="enrolledCourses" class="enrolled-courses">
+                    <!-- Enrolled courses will appear here -->
+                    <div class="empty-state">
+                        <i class="fas fa-graduation-cap"></i>
+                        <h3>No Courses Enrolled Yet</h3>
+                        <p>Explore our courses and start your learning journey!</p>
+                        <button class="btn btn-primary" onclick="scrollToCourses()">
+                            <i class="fas fa-search"></i> Browse Courses
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modals -->
+    
+    <!-- Student Registration Modal -->
+    <div class="modal" id="registrationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-plus"></i> Complete Your Registration</h3>
+                <button class="close-modal" onclick="closeModal('registrationModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="registrationForm">
+                <div class="form-group">
+                    <label for="fullName">
+                        <i class="fas fa-user"></i> Full Name
+                    </label>
+                    <input type="text" id="fullName" class="form-control" required 
+                           placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label for="dob">
+                        <i class="fas fa-calendar"></i> Date of Birth
+                    </label>
+                    <input type="date" id="dob" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">
+                        <i class="fas fa-phone"></i> Phone Number
+                    </label>
+                    <input type="tel" id="phone" class="form-control" required 
+                           placeholder="Enter your phone number">
+                </div>
+                <div class="form-group">
+                    <label for="education">
+                        <i class="fas fa-graduation-cap"></i> Education Level
+                    </label>
+                    <select id="education" class="form-control" required>
+                        <option value="">Select Education Level</option>
+                        <option value="highschool">High School</option>
+                        <option value="undergraduate">Undergraduate</option>
+                        <option value="graduate">Graduate</option>
+                        <option value="postgraduate">Post Graduate</option>
+                        <option value="phd">PhD</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-check-circle"></i> Complete Registration
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Course Content Modal -->
+    <div class="modal" id="courseContentModal">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3 id="modalCourseTitle"></h3>
+                <button class="close-modal" onclick="closeModal('courseContentModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('videos')">
+                    <i class="fas fa-video"></i> Video Classes
+                </button>
+                <button class="tab-btn" onclick="switchTab('notes')">
+                    <i class="fas fa-file-pdf"></i> Study Notes
+                </button>
+                <button class="tab-btn" onclick="switchTab('tests')">
+                    <i class="fas fa-question-circle"></i> Mock Tests
+                </button>
+                <button class="tab-btn" onclick="switchTab('currentAffairs')">
+                    <i class="fas fa-newspaper"></i> Current Affairs
+                </button>
+            </div>
+            
+            <div id="contentContainer" class="content-container">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Mock Test Modal -->
+    <div class="modal" id="mockTestModal">
+        <div class="modal-content test-modal">
+            <div class="modal-header">
+                <div class="test-header">
+                    <h3><i class="fas fa-clock"></i> Mock Test</h3>
+                    <div class="timer" id="testTimer">30:00</div>
+                </div>
+                <button class="close-modal" onclick="closeTest()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="test-container">
+                <div class="question-navigation" id="questionNav">
+                    <!-- Navigation buttons will be generated here -->
+                </div>
+                
+                <div class="question-container">
+                    <div class="question-header">
+                        <span class="question-number" id="questionNumber">Q1</span>
+                        <span class="question-section" id="questionSection"></span>
+                    </div>
+                    <div class="question-text" id="questionText"></div>
+                    
+                    <div class="options-container" id="optionsContainer"></div>
+                    
+                    <div class="test-actions">
+                        <button class="btn btn-secondary" onclick="previousQuestion()">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </button>
+                        <button class="btn btn-secondary" onclick="nextQuestion()">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </button>
+                        <button class="btn btn-primary" onclick="submitTest()" id="submitTestBtn">
+                            <i class="fas fa-paper-plane"></i> Submit Test
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Results Modal -->
+    <div class="modal" id="resultsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-medal"></i> Test Results</h3>
+                <button class="close-modal" onclick="closeModal('resultsModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="testResults" class="test-results">
+                <!-- Results will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <img src="https://img.icons8.com/color/48/000000/books.png" alt="Odigyan Logo">
+                        <div class="footer-brand">
+                            <h3>Odigyan</h3>
+                            <p>Empowering Competitive Minds</p>
+                        </div>
+                    </div>
+                    <p class="footer-description">
+                        Your trusted partner for competitive exam preparation with comprehensive study materials, video classes, and mock tests.
+                    </p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="#" onclick="scrollToCourses()"><i class="fas fa-chevron-right"></i> Courses</a></li>
+                        <li><a href="#" onclick="showAbout()"><i class="fas fa-chevron-right"></i> About Us</a></li>
+                        <li><a href="https://t.me/Odigyan" target="_blank"><i class="fas fa-chevron-right"></i> Telegram Channel</a></li>
+                        <li><a href="#" onclick="showContact()"><i class="fas fa-chevron-right"></i> Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Contact Info</h4>
+                    <ul class="contact-info">
+                        <li><i class="fas fa-envelope"></i> support@odigyan.in</li>
+                        <li><i class="fas fa-phone"></i> +91 1234567890</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Hosted on GitHub Pages</li>
+                    </ul>
+                    <div class="social-links">
+                        <a href="https://t.me/Odigyan" target="_blank" class="social-link">
+                            <i class="fab fa-telegram"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p class="copyright">
+                    © 2024 Odigyan. All rights reserved. | 
+                    <a href="#" onclick="showPrivacy()">Privacy Policy</a> | 
+                    <a href="#" onclick="showTerms()">Terms of Service</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Files -->
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+    
+    <script>
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hide loading spinner after 1 second
+            setTimeout(() => {
+                document.getElementById('loadingSpinner').style.display = 'none';
+            }, 1000);
+            
+            // Start banner slider
+            startBannerSlider();
+        });
+
+        function startBannerSlider() {
+            let currentSlide = 0;
+            const slides = document.querySelectorAll('.banner-slide');
+            const dots = document.querySelectorAll('.dot');
+            
+            if (slides.length <= 1) return;
+            
+            setInterval(() => {
+                slides[currentSlide].classList.remove('active');
+                dots[currentSlide].classList.remove('active');
+                
+                currentSlide = (currentSlide + 1) % slides.length;
+                
+                slides[currentSlide].classList.add('active');
+                dots[currentSlide].classList.add('active');
+            }, 5000);
+        }
+
+        function changeSlide(index) {
+            const slides = document.querySelectorAll('.banner-slide');
+            const dots = document.querySelectorAll('.dot');
+            
+            slides.forEach(slide => slide.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+            
+            slides[index].classList.add('active');
+            dots[index].classList.add('active');
+        }
+
+        function scrollToCourses() {
+            document.getElementById('coursesSection').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function closeTest() {
+            if (confirm('Are you sure you want to leave the test? Your progress will be lost.')) {
+                closeModal('mockTestModal');
+                if (window.testTimer) {
+                    clearInterval(window.testTimer);
+                }
+            }
+        }
+
+        function switchTab(tabName) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+            
+            // Load content for the selected tab
+            if (typeof window.loadTabContent === 'function') {
+                window.loadTabContent(tabName);
+            }
+        }
+
+        function showAbout() {
+            alert('Odigyan is a comprehensive platform for competitive exam preparation. We provide quality study materials, video classes, and mock tests to help students achieve their goals.');
+        }
+
+        function showContact() {
+            alert('Contact us at: support@odigyan.in\nPhone: +91 1234567890\nTelegram: t.me/Odigyan');
+        }
+
+        function showPrivacy() {
+            alert('Privacy Policy: Your data is secure with us. We only collect necessary information for course enrollment and progress tracking.');
+        }
+
+        function showTerms() {
+            alert('Terms of Service: By using Odigyan, you agree to our terms. All study materials are for personal use only.');
+        }
+    </script>
+</body>
+</html>
